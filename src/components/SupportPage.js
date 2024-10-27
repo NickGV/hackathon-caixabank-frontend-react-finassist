@@ -46,12 +46,17 @@ function SupportPage() {
       <Box
         sx={{
           display: "flex",
+          flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          height: "100vh",
+          height: "50vh",
+          gap: 2
         }}
       >
-        <CircularProgress />
+        <CircularProgress size={40} />
+        <Typography variant="body1" color="text.secondary">
+          Loading support contacts...
+        </Typography>
       </Box>
     );
   }
@@ -61,12 +66,26 @@ function SupportPage() {
       <Box
         sx={{
           display: "flex",
+          flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          height: "100vh",
+          height: "50vh",
+          gap: 2
         }}
       >
-        <Typography color="error">{error}</Typography>
+        <Typography variant="h6" color="error">
+          Error loading contacts
+        </Typography>
+        <Typography color="text.secondary">
+          {error}
+        </Typography>
+        <Button 
+          variant="contained" 
+          onClick={() => window.location.reload()}
+          sx={{ mt: 2 }}
+        >
+          Retry
+        </Button>
       </Box>
     );
   }
