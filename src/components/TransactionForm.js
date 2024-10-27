@@ -14,6 +14,7 @@ import {
   FormControl,
   Grid,
   Box,
+  FormHelperText,
 } from "@mui/material";
 import { categoryKeywords } from "../constants/categoryKeywords";
 import { allCategories } from "../constants/categories";
@@ -26,6 +27,12 @@ function TransactionForm({ transactionToEdit, onClose }) {
   const [type, setType] = useState("expense");
   const [category, setCategory] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [errors, setErrors] = useState({
+    description: "",
+    amount: "",
+    category: "",
+    date: ""
+  });
 
   const assignCategory = (desc) => {
     for (const [keyword, category] of Object.entries(categoryKeywords)) {
@@ -44,23 +51,60 @@ function TransactionForm({ transactionToEdit, onClose }) {
     }
   }, [transactionToEdit]);
 
+  const validateForm = () => {
+    const newErrors = {};
+    let isValid = true;
+
+    // Description validation
+    if (!description.trim()) {
+      newErrors.description = "Description is required";
+      isValid = false;
+    } else if (description.length < 3) {
+      newErrors.description = "Description must be at least 3 characters";
+      isValid = false;
+    }
+
+    // Amount validation
+    if (!amount) {
+      newErrors.amount = "Amount is required";
+      isValid = false;
+    } else if (parseFloat(amount) <= 0) {
+      newErrors.amount = "Amount must be greater than 0";
+      isValid = false;
+    }
+
+    // Category validation
+    if (!category) {
+      newErrors.category = "Category is required";
+      isValid = false;
+    }
+
+    // Date validation
+    if (!date) {
+      newErrors.date = "Date is required";
+      isValid = false;
+    } else {
+      const selectedDate = new Date(date);
+      const today = new Date();
+      if (selectedDate > today) {
+        newErrors.date = "Date cannot be in the future";
+        isValid = false;
+      }
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Instructions:
-    // - Validate that all fields are filled in.
-    // - If editing, update the transaction in the store.
-    // - If adding a new transaction, create it and save it to the store.
-    // - The transaction type should be either "income" or "expense".
-    // - Ensure the transaction has the following structure: { id, description, amount, type, category, date }
-
-    if (!description || !amount || !type || !category || !date) {
-      alert("Please fill in all fields.");
+    if (!validateForm()) {
       return;
     }
 
     const newTransaction = {
-      id: Date.now(),
+      id: transactionToEdit?.id || Date.now(),
       description,
       amount: parseFloat(amount),
       type,
@@ -92,11 +136,16 @@ function TransactionForm({ transactionToEdit, onClose }) {
               <TextField
                 label="Description"
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                  setErrors({ ...errors, description: "" });
+                }}
                 fullWidth
                 margin="normal"
                 required
                 name="description"
+                error={!!errors.description}
+                helperText={errors.description}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -104,12 +153,17 @@ function TransactionForm({ transactionToEdit, onClose }) {
                 label="Amount (€)"
                 type="number"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => {
+                  setAmount(e.target.value);
+                  setErrors({ ...errors, amount: "" });
+                }}
                 fullWidth
                 margin="normal"
                 required
                 inputProps={{ min: 0, step: "0.01" }}
                 name="amount"
+                error={!!errors.amount}
+                helperText={errors.amount}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -129,23 +183,32 @@ function TransactionForm({ transactionToEdit, onClose }) {
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth margin="normal" required>
+              <FormControl 
+                fullWidth 
+                margin="normal" 
+                required
+                error={!!errors.category}
+              >
                 <InputLabel id="category-label">Category</InputLabel>
                 <Select
                   labelId="category-label"
                   value={category}
-                  onChange={(e) => setCategory(e.target.value)}
+                  onChange={(e) => {
+                    setCategory(e.target.value);
+                    setErrors({ ...errors, category: "" });
+                  }}
                   label="Category"
                   name="category"
-                  inputProps={{ name: "filterCategoryForm" }}
                 >
-                  {allCategories.map((category) => (
-                    <MenuItem key={category} value={category}>
-                      {category}
+                  {allCategories.map((cat) => (
+                    <MenuItem key={cat} value={cat}>
+                      {cat}
                     </MenuItem>
                   ))}
-                  <MenuItem value="Other Expenses">Other Expenses</MenuItem>
                 </Select>
+                {errors.category && (
+                  <FormHelperText>{errors.category}</FormHelperText>
+                )}
               </FormControl>
             </Grid>
             <TextField
@@ -154,11 +217,16 @@ function TransactionForm({ transactionToEdit, onClose }) {
               sm={6}
               type="date"
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={(e) => {
+                setDate(e.target.value);
+                setErrors({ ...errors, date: "" });
+              }}
               fullWidth
               margin="normal"
               required
               name="date"
+              error={!!errors.date}
+              helperText={errors.date}
             />
           </Grid>
         </DialogContent>
