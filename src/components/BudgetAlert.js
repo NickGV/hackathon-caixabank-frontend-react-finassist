@@ -1,35 +1,69 @@
 // src/components/BudgetAlert.js
-import React, { useEffect } from 'react';
-import { useStore } from '@nanostores/react';
-import { userSettingsStore } from '../stores/userSettingsStore';
-import { transactionsStore } from '../stores/transactionStore';
-import { Alert } from '@mui/material';
-import { budgetAlertStore } from '../stores/budgetAlertStore'; // Importar el store de alertas
+import React, { useEffect } from "react";
+import { useStore } from "@nanostores/react";
+import { userSettingsStore } from "../stores/userSettingsStore";
+import { transactionsStore } from "../stores/transactionStore";
+import { Alert } from "@mui/material";
+import { budgetAlertStore } from "../stores/budgetAlertStore"; // Importar el store de alertas
 
 const BudgetAlert = () => {
-    const userSettings = useStore(userSettingsStore);
-    const transactions = useStore(transactionsStore);
+  const userSettings = useStore(userSettingsStore);
+  const transactions = useStore(transactionsStore);
 
+  const totalExpense = transactions.reduce(
+    (acc, transaction) => acc + transaction.amount,
+    0
+  );
+
+  const budgetExceeded = totalExpense > userSettings.totalBudgetLimit;
+  const categoryExpenses = transactions.reduce((acc, transaction) => {
+    acc[transaction.category] =
+      (acc[transaction.category] || 0) + transaction.amount;
+    return acc;
+  }, {});
+
+  const categoryExceeded = Object.keys(userSettings.categoryLimits).some(
+    (category) =>
+      categoryExpenses[category] > userSettings.categoryLimits[category]
+  );
+
+  useEffect(() => {
+    if (budgetExceeded) {
+      budgetAlertStore.set({
+        isVisible: true,
+        message: `You have exceeded your total budget limit of ${userSettings.totalBudgetLimit} €!`,
+        notificationCount: budgetAlertStore.get().notificationCount + 1,
+        severity: "warning",
+      });
+    } else if (categoryExpenses) {
+      budgetAlertStore.set({
+        isVisible: true,
+        message: `You have exceeded your category budget limit of ${userSettings.categoryLimits} €!`,
+        notificationCount: budgetAlertStore.get().notificationCount + 1,
+        severity: "warning",
+      });
+    } else {
+      budgetAlertStore.set({
+        isVisible: true,
+        message: `You have exceeded your category budget limit of ${userSettings.categoryLimits} €!`,
+        notificationCount: budgetAlertStore.get().notificationCount + 1,
+        severity: "info",
+      });
+    }
     // Instructions:
-    // - Calculate the total expenses from the transactions.
-    const totalExpense = 0; // Replace with the total expenses calculation.
+    // - If the budget has been exceeded, set the `isVisible` property in the `budgetAlertStore` to true and provide a warning message.
+    // - If the budget has not been exceeded, set `isVisible` to false and clear the message.
+  }, [budgetExceeded, userSettings.totalBudgetLimit]);
 
-    // Determine if the budget has been exceeded
-    const budgetExceeded = false; // Replace with a comparison of totalExpense and userSettings.totalBudgetLimit
-
-    // Use the useEffect hook to update the budgetAlertStore when the budget is exceeded
-    useEffect(() => {
-        // Instructions:
-        // - If the budget has been exceeded, set the `isVisible` property in the `budgetAlertStore` to true and provide a warning message.
-        // - If the budget has not been exceeded, set `isVisible` to false and clear the message.
-    }, [budgetExceeded, userSettings.totalBudgetLimit]);
-
-    return (
-        // Conditional rendering of the alert
-        // Instructions:
-        // - If the budget is exceeded, return an `Alert` component with the appropriate message and severity.
-        null // Replace with conditional rendering logic
-    );
+  return (
+    <Alert
+      severity={BudgetAlert.severity}
+      sx={{ mb: 2 }}
+      hidden={!budgetAlertStore.get().isVisible}
+    >
+      {budgetAlertStore.get().message}
+    </Alert>
+  );
 };
 
 export default BudgetAlert;
