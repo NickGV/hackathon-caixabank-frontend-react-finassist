@@ -4,10 +4,17 @@ import { login } from "../stores/authStore";
 import { Box, Button, TextField, Typography, Alert, Grid } from "@mui/material";
 
 function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+    general: "",
+  });
   const [showCredentials, setShowCredentials] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const defaultCredentials = {
@@ -15,35 +22,82 @@ function LoginPage() {
     password: "password123",
   };
 
-  const handleLogin = (e) => {
-    e.preventDefault();
+  const validateForm = () => {
+    const newErrors = {};
+    let isValid = true;
 
-    if (!email || !password) {
-      setError("Please fill in all fields.");
+    // Email validation
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+      isValid = false;
+    }
+
+    // Password validation
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+      isValid = false;
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    setErrors(prev => ({
+      ...prev,
+      [name]: "",
+      general: ""
+    }));
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
       return;
     }
 
-    const storedUser = JSON.parse(localStorage.getItem("user"));
+    setIsSubmitting(true);
+    setErrors({ email: "", password: "", general: "" });
 
-    if (
-      (email === defaultCredentials.email &&
-        password === defaultCredentials.password) ||
-      (storedUser &&
-        storedUser.email === email &&
-        storedUser.password === password)
-    ) {
-      login({ email, password });
-      navigate("/");
-    } else {
-      setError("Invalid email or password.");
+    try {
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+
+      if (
+        (formData.email === defaultCredentials.email &&
+          formData.password === defaultCredentials.password) ||
+        (storedUser &&
+          storedUser.email === formData.email &&
+          storedUser.password === formData.password)
+      ) {
+        await login(formData);
+        navigate("/");
+      } else {
+        setErrors(prev => ({
+          ...prev,
+          general: "Invalid email or password"
+        }));
+      }
+    } catch (error) {
+      setErrors(prev => ({
+        ...prev,
+        general: "An error occurred during login. Please try again."
+      }));
+    } finally {
+      setIsSubmitting(false);
     }
-  };
-
-  const handleShowDefaultCredentials = () => {
-    // Show default credentials in case the user requests it
-    setEmail(defaultCredentials.email);
-    setPassword(defaultCredentials.password);
-    setShowCredentials(true);
   };
 
   return (
@@ -52,51 +106,62 @@ function LoginPage() {
         maxWidth: 400,
         mx: "auto",
         mt: 8,
-        p: 2,
+        p: 3,
         border: "1px solid #ddd",
         borderRadius: 2,
+        boxShadow: 1,
       }}
     >
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom align="center">
         Login
       </Typography>
+
       <form onSubmit={handleLogin}>
         <TextField
           label="Email"
           type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          error={!!errors.email}
+          helperText={errors.email}
           fullWidth
           margin="normal"
+          required
+          disabled={isSubmitting}
         />
+        
         <TextField
           label="Password"
           type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          name="password"
+          value={formData.password}
+          onChange={handleChange}
+          error={!!errors.password}
+          helperText={errors.password}
           fullWidth
           margin="normal"
+          required
+          disabled={isSubmitting}
         />
+
+        {errors.general && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {errors.general}
+          </Alert>
+        )}
+
         <Button
           type="submit"
           variant="contained"
           color="primary"
           fullWidth
-          sx={{ mt: 2 }}
+          sx={{ mt: 3 }}
+          disabled={isSubmitting}
         >
-          Login
+          {isSubmitting ? "Logging in..." : "Login"}
         </Button>
       </form>
-
-      {/* Show error message when applicable */}
-      {/* - Use the Alert component to display the error message if one exists. */}
-      {/* - Ensure that registration and forgot password options are displayed below the error message if present. */}
-
-      {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {error}
-        </Alert>
-      )}
 
       <Grid container spacing={2} sx={{ mt: 2 }}>
         <Grid item xs={12}>
@@ -104,17 +169,18 @@ function LoginPage() {
             onClick={() => navigate("/register")}
             fullWidth
             variant="outlined"
+            disabled={isSubmitting}
           >
             Register
           </Button>
         </Grid>
         <Grid item xs={12}>
           <Button
-            onClick={handleShowDefaultCredentials}
+            onClick={() => navigate("/forgot-password")}
             fullWidth
             variant="text"
           >
-            Show Default Credentials
+            Forgot Password
           </Button>
         </Grid>
       </Grid>
