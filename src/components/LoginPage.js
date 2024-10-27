@@ -26,7 +26,6 @@ function LoginPage() {
     const newErrors = {};
     let isValid = true;
 
-    // Email validation
     if (!formData.email) {
       newErrors.email = "Email is required";
       isValid = false;
@@ -35,7 +34,6 @@ function LoginPage() {
       isValid = false;
     }
 
-    // Password validation
     if (!formData.password) {
       newErrors.password = "Password is required";
       isValid = false;
@@ -50,21 +48,20 @@ function LoginPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    // Clear error when user starts typing
-    setErrors(prev => ({
+    setErrors((prev) => ({
       ...prev,
       [name]: "",
-      general: ""
+      general: "",
     }));
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -85,15 +82,15 @@ function LoginPage() {
         await login(formData);
         navigate("/");
       } else {
-        setErrors(prev => ({
+        setErrors((prev) => ({
           ...prev,
-          general: "Invalid email or password"
+          general: "Invalid email or password",
         }));
       }
     } catch (error) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        general: "An error occurred during login. Please try again."
+        general: "An error occurred during login. Please try again.",
       }));
     } finally {
       setIsSubmitting(false);
@@ -130,7 +127,7 @@ function LoginPage() {
           required
           disabled={isSubmitting}
         />
-        
+
         <TextField
           label="Password"
           type="password"
