@@ -42,10 +42,10 @@ function Recommendations() {
   );
   const expenseLastMonth = expenses.filter(
     (t) => t.date.getMonth() === new Date().getMonth() - 1
-  ); 
+  );
 
-  let message = ""; 
-  
+  let message = "";
+
   if (expenseLastMonth.length === 0) {
     message = "Keep up the good work. You haven't recorded any expenses yet.";
   } else if (expenseThisMonth > expenseLastMonth) {
