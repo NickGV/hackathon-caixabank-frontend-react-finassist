@@ -7,6 +7,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Box,
 } from "@mui/material";
 
 function RecentTransactions({ transactions }) {
@@ -16,7 +17,7 @@ function RecentTransactions({ transactions }) {
     .slice(0, 5);
 
   return (
-    <div>
+    <Box sx={{ maxWidth: "100%", overflow: "auto" }}>
       <h3>Recent Transactions</h3>
       <TableContainer component={Paper}>
         <Table size="small">
@@ -44,7 +45,7 @@ function RecentTransactions({ transactions }) {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </Box>
   );
 }
 
