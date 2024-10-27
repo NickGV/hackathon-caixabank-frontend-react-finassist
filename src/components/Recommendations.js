@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { transactionsStore } from "../stores/transactionStore";
-import { CircularProgress, Typography, Box } from "@mui/material";
+import { CircularProgress, Typography, Box, Card, CardContent } from "@mui/material";
 
 function Recommendations() {
   const transactions = useStore(transactionsStore);
@@ -64,8 +64,12 @@ function Recommendations() {
 
   return (
     <Box sx={{ mt: 4 }}>
-      <Typography variant="h5">Recommendations</Typography>
-      <Typography>{message}</Typography>
+      <Card variant="outlined">
+        <CardContent>
+          <Typography variant="h5">Recommendations</Typography>
+          <Typography>{message}</Typography>
+        </CardContent>
+      </Card>
     </Box>
   );
 }
