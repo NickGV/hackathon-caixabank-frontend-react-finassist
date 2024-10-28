@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { transactionsStore } from "../stores/transactionStore";
+import { Alert, CircularProgress } from "@mui/material";
 import {
   BarChart,
   Bar,
@@ -13,24 +14,44 @@ import {
 
 function AnalysisGraph() {
   const transactions = useStore(transactionsStore);
-  const categories = [...new Set(transactions.map((t) => t.category))];
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Chart data
-  // Instructions:
-  // - Aggregate income and expense data for each category
-  // - For each category, calculate the total 'income' and 'expense'
-  // - The data array should return an object like this for each category: { category, Income, Expense }
-  const data = categories.map((category) => {
-    const income = transactions
-      .filter((t) => t.category === category && t.type === "income")
-      .reduce((acc, t) => acc + parseFloat(t.amount), 0);
+  useEffect(() => {
+    const processChartData = () => {
+      try {
+        const categories = [...new Set(transactions.map((t) => t.category))];
+        const chartData = categories.map((category) => {
+          const income = transactions
+            .filter((t) => t.category === category && t.type === "income")
+            .reduce((acc, t) => acc + parseFloat(t.amount), 0);
 
-    const expense = transactions
-      .filter((t) => t.category === category && t.type === "expense")
-      .reduce((acc, t) => acc + parseFloat(t.amount), 0);
+          const expense = transactions
+            .filter((t) => t.category === category && t.type === "expense")
+            .reduce((acc, t) => acc + parseFloat(t.amount), 0);
 
-    return { category, Income: income, Expense: expense };
-  });
+          return { category, Income: income, Expense: expense };
+        });
+
+        setData(chartData);
+      } catch (err) {
+        setError("Error processing chart data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    processChartData();
+  }, [transactions]);
+
+  if (loading) {
+    return <CircularProgress />;
+  }
+
+  if (error) {
+    return <Alert severity="error">{error}</Alert>;
+  }
 
   return (
     <ResponsiveContainer width="100%" height="100%" minHeight={400}>
