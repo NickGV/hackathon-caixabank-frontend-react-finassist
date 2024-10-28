@@ -1,7 +1,7 @@
 import React from 'react';
 import { useStore } from '@nanostores/react';
 import { transactionsStore } from '../stores/transactionStore';
-import BalanceChart from './BalanceChart';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 function BalanceOverTime() {
     const transactions = useStore(transactionsStore);
@@ -18,7 +18,16 @@ function BalanceOverTime() {
 
     const sortedBalanceData = Object.values(balanceData).sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    return <BalanceChart data={sortedBalanceData} />;
+    return (
+        <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={sortedBalanceData}>
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="balance" stroke="#82ca9d" />
+            </LineChart>
+        </ResponsiveContainer>
+    );
 }
 
 export default BalanceOverTime;
