@@ -11,34 +11,104 @@ import {
   ListItemText,
   TextField,
   Button,
+  Chip,
+  Divider,
 } from "@mui/material";
 import { onRenderCallback } from "../utils/onRenderCallback";
+
+// Componente para el contacto individual (mejora la reusabilidad)
+const ContactItem = React.memo(({ user }) => (
+  <ListItem sx={{ mb: 2 }}>
+    <ListItemAvatar>
+      <Avatar sx={{ bgcolor: 'primary.main' }}>{user.name[0]}</Avatar>
+    </ListItemAvatar>
+    <ListItemText
+      primary={
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {user.name}
+          <Chip 
+            label={user.company.name} 
+            size="small" 
+            color="primary" 
+            variant="outlined"
+          />
+        </Box>
+      }
+      secondary={
+        <>
+          <Typography component="span" variant="body2">
+            Email: {user.email}
+          </Typography>
+          <br />
+          <Typography component="span" variant="body2">
+            Phone: {user.phone}
+          </Typography>
+        </>
+      }
+    />
+    <Box sx={{ display: 'flex', gap: 1 }}>
+      <Button
+        variant="contained"
+        color="primary"
+        href={`mailto:${user.email}`}
+        size="small"
+      >
+        Email
+      </Button>
+      <Button
+        variant="outlined"
+        color="primary"
+        href={`tel:${user.phone}`}
+        size="small"
+      >
+        Call
+      </Button>
+    </Box>
+  </ListItem>
+));
 
 function SupportPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    fetch("https://jsonplaceholder.typicode.com/users")
-      .then((response) => response.json())
-      .then((data) => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch("https://jsonplaceholder.typicode.com/users");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
         setUsers(data);
+      } catch (error) {
+        setError(`Failed to fetch support contacts: ${error.message}`);
+      } finally {
         setLoading(false);
-      })
-      .catch((error) => {
-        setError(error.message);
-        setLoading(false);
-      });
-  }, []);
+      }
+    };
+
+    fetchUsers();
+  }, [retryCount]);
 
   const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase())
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.company.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
+  };
+
+  const handleRetry = () => {
+    setRetryCount(prev => prev + 1);
   };
 
   if (loading) {
@@ -81,7 +151,7 @@ function SupportPage() {
         </Typography>
         <Button 
           variant="contained" 
-          onClick={() => window.location.reload()}
+          onClick={handleRetry}
           sx={{ mt: 2 }}
         >
           Retry
@@ -98,37 +168,35 @@ function SupportPage() {
         </Typography>
 
         <TextField
-          label="Search by Name"
+          label="Search contacts"
           variant="outlined"
           fullWidth
           value={searchTerm}
           onChange={handleSearchChange}
+          placeholder="Search by name, email, or company..."
           sx={{ mb: 4 }}
         />
 
         <Suspense fallback={<CircularProgress />}>
           <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 3 }}>
-            <List>
-              {filteredUsers.map((user) => (
-                <ListItem key={user.id} sx={{ mb: 2 }}>
-                  <ListItemAvatar>
-                    <Avatar>{user.name[0]}</Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={`${user.name} (${user.email})`}
-                    secondary={`Phone: ${user.phone} | Company: ${user.company.name}`}
-                  />
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    href={`mailto:${user.email}`}
-                    sx={{ ml: 2 }}
-                  >
-                    Contact
-                  </Button>
-                </ListItem>
-              ))}
-            </List>
+            {filteredUsers.length > 0 ? (
+              <List>
+                {filteredUsers.map((user) => (
+                  <React.Fragment key={user.id}>
+                    <ContactItem user={user} />
+                    {user.id !== filteredUsers[filteredUsers.length - 1].id && (
+                      <Divider variant="inset" component="li" />
+                    )}
+                  </React.Fragment>
+                ))}
+              </List>
+            ) : (
+              <Box sx={{ textAlign: 'center', py: 3 }}>
+                <Typography color="text.secondary">
+                  No contacts found matching your search criteria.
+                </Typography>
+              </Box>
+            )}
           </Paper>
         </Suspense>
       </Box>

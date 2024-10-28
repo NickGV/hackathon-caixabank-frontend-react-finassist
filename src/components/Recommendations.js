@@ -85,7 +85,7 @@ function Recommendations() {
 
       setRecommendations(newRecommendations);
     } catch (err) {
-      throw new Error("Error generating recommendations");
+      setError("Error generating recommendations");
     }
   };
 
@@ -134,7 +134,7 @@ function Recommendations() {
             <Button 
               color="inherit" 
               size="small"
-              onClick={() => generateRecommendations()}
+              onClick={generateRecommendations}
             >
               Retry
             </Button>
