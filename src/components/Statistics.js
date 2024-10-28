@@ -14,8 +14,10 @@ function Statistics() {
         return transaction.type === "expense" ? total + transaction.amount : total;
     }, 0);
 
+    const balance = totalIncome - totalExpense;
+
     return (
-        <StatisticsDisplay totalIncome={totalIncome} totalExpense={totalExpense} />
+        <StatisticsDisplay totalIncome={totalIncome} totalExpense={totalExpense} balance={balance} />
     );
 }
 

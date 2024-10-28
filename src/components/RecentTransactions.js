@@ -2,15 +2,7 @@ import React from "react";
 import { useStore } from "@nanostores/react";
 import { transactionsStore } from "../stores/transactionStore";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   Box,
-  CircularProgress,
   Alert,
   Typography,
 } from "@mui/material";
@@ -21,7 +13,7 @@ function RecentTransactions() {
   const recentTransactions = transactions
     .slice()
     .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .slice(0, 5);
+    .slice(0, 5); 
 
   if (recentTransactions.length === 0) {
     return (
@@ -34,7 +26,7 @@ function RecentTransactions() {
   return (
     <Box sx={{ maxWidth: "100%", overflow: "auto" }}>
       <Typography variant="h6" gutterBottom>Recent Transactions</Typography>
-      <TransactionList transactions={recentTransactions} />
+      <TransactionList transactions={recentTransactions} /> 
     </Box>
   );
 }

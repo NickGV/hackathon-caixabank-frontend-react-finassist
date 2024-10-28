@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
-import { transactionsStore } from "../stores/transactionStore";
+import { transactionsStore, addTransaction } from "../stores/transactionStore";
 import {
   Dialog,
   DialogTitle,
@@ -9,6 +9,7 @@ import {
   Button,
   Grid,
   Box,
+  TextField,
 } from "@mui/material";
 import { categoryKeywords } from "../constants/categoryKeywords";
 import { allCategories } from "../constants/categories";
@@ -19,16 +20,28 @@ import CategoryField from "./CategoryField";
 function TransactionForm({ transactionToEdit, onClose }) {
   const transactions = useStore(transactionsStore);
 
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
-  const [type, setType] = useState("expense");
-  const [category, setCategory] = useState("");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [description, setDescription] = useState(
+    transactionToEdit ? transactionToEdit.description : ""
+  );
+  const [amount, setAmount] = useState(
+    transactionToEdit ? transactionToEdit.amount : ""
+  );
+  const [type, setType] = useState(
+    transactionToEdit ? transactionToEdit.type : "expense"
+  );
+  const [category, setCategory] = useState(
+    transactionToEdit ? transactionToEdit.category : ""
+  );
+  const [date, setDate] = useState(
+    transactionToEdit
+      ? transactionToEdit.date
+      : new Date().toISOString().split("T")[0]
+  );
   const [errors, setErrors] = useState({
     description: "",
     amount: "",
     category: "",
-    date: ""
+    date: "",
   });
 
   const assignCategory = (desc) => {
@@ -40,7 +53,6 @@ function TransactionForm({ transactionToEdit, onClose }) {
     return "Other Expenses";
   };
 
-  // Auto-assign a category if adding a new transaction
   useEffect(() => {
     if (!transactionToEdit) {
       const category = assignCategory(description);
@@ -61,7 +73,6 @@ function TransactionForm({ transactionToEdit, onClose }) {
       isValid = false;
     }
 
-    // Amount validation
     if (!amount) {
       newErrors.amount = "Amount is required";
       isValid = false;
@@ -70,13 +81,11 @@ function TransactionForm({ transactionToEdit, onClose }) {
       isValid = false;
     }
 
-    // Category validation
     if (!category) {
       newErrors.category = "Category is required";
       isValid = false;
     }
 
-    // Date validation
     if (!date) {
       newErrors.date = "Date is required";
       isValid = false;
@@ -115,7 +124,7 @@ function TransactionForm({ transactionToEdit, onClose }) {
       );
       transactionsStore.set(updatedTransactions);
     } else {
-      transactionsStore.set([...transactions, newTransaction]);
+      addTransaction(newTransaction);
     }
 
     onClose();
