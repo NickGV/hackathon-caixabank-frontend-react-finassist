@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { memo } from 'react'; 
 import { useStore } from '@nanostores/react';
 import { transactionsStore } from '../stores/transactionStore';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
-function BalanceOverTime() {
+const BalanceOverTime = memo(() => { 
     const transactions = useStore(transactionsStore);
 
     // Calcular el balance acumulado
@@ -28,6 +28,6 @@ function BalanceOverTime() {
             </LineChart>
         </ResponsiveContainer>
     );
-}
+});
 
 export default BalanceOverTime;

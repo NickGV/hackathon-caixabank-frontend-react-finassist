@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, memo } from "react"; 
 import { useStore } from "@nanostores/react";
 import { transactionsStore, addTransaction } from "../stores/transactionStore";
 import {
@@ -17,7 +17,7 @@ import DescriptionField from "./DescriptionField";
 import AmountField from "./AmountField";
 import CategoryField from "./CategoryField";
 
-function TransactionForm({ transactionToEdit, onClose }) {
+const TransactionForm = memo(({ transactionToEdit, onClose }) => { 
   const transactions = useStore(transactionsStore);
 
   const [description, setDescription] = useState(
@@ -64,7 +64,6 @@ function TransactionForm({ transactionToEdit, onClose }) {
     const newErrors = {};
     let isValid = true;
 
-    // Description validation
     if (!description.trim()) {
       newErrors.description = "Description is required";
       isValid = false;
@@ -215,6 +214,6 @@ function TransactionForm({ transactionToEdit, onClose }) {
       </form>
     </Dialog>
   );
-}
+});
 
 export default TransactionForm;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useStore } from "@nanostores/react";
 import { transactionsStore } from "../stores/transactionStore";
 import { Alert, CircularProgress } from "@mui/material";
@@ -54,19 +54,21 @@ function AnalysisGraph() {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <BarChart
-        data={data}
-        margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-      >
-        <XAxis dataKey="category" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="Income" stackId="a" fill="#82ca9d" />
-        <Bar dataKey="Expense" stackId="a" fill="#8884d8" />
-      </BarChart>
-    </ResponsiveContainer>
+    <Suspense fallback={<CircularProgress />}>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart
+          data={data}
+          margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+        >
+          <XAxis dataKey="category" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="Income" stackId="a" fill="#82ca9d" />
+          <Bar dataKey="Expense" stackId="a" fill="#8884d8" />
+        </BarChart>
+      </ResponsiveContainer>
+    </Suspense>
   );
 }
 
