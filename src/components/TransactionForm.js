@@ -6,18 +6,15 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   Button,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
   Grid,
   Box,
-  FormHelperText,
 } from "@mui/material";
 import { categoryKeywords } from "../constants/categoryKeywords";
 import { allCategories } from "../constants/categories";
+import DescriptionField from "./DescriptionField";
+import AmountField from "./AmountField";
+import CategoryField from "./CategoryField";
 
 function TransactionForm({ transactionToEdit, onClose }) {
   const transactions = useStore(transactionsStore);
@@ -133,101 +130,55 @@ function TransactionForm({ transactionToEdit, onClose }) {
         <DialogContent>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <TextField
-                label="Description"
+              <DescriptionField
                 value={description}
                 onChange={(e) => {
                   setDescription(e.target.value);
                   setErrors({ ...errors, description: "" });
                 }}
-                fullWidth
-                margin="normal"
-                required
-                name="description"
-                error={!!errors.description}
+                error={errors.description}
                 helperText={errors.description}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                label="Amount (€)"
-                type="number"
+              <AmountField
                 value={amount}
                 onChange={(e) => {
                   setAmount(e.target.value);
                   setErrors({ ...errors, amount: "" });
                 }}
-                fullWidth
-                margin="normal"
-                required
-                inputProps={{ min: 0, step: "0.01" }}
-                name="amount"
-                error={!!errors.amount}
+                error={errors.amount}
                 helperText={errors.amount}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth margin="normal" required>
-                <InputLabel id="type-label">Type</InputLabel>
-                <Select
-                  labelId="type-label"
-                  value={type}
-                  onChange={(e) => setType(e.target.value)}
-                  label="Type"
-                  name="type"
-                  inputProps={{ name: "filterTypeForm" }}
-                >
-                  <MenuItem value="income">Income</MenuItem>
-                  <MenuItem value="expense">Expense</MenuItem>
-                </Select>
-              </FormControl>
+              <CategoryField
+                value={category}
+                onChange={(e) => {
+                  setCategory(e.target.value);
+                  setErrors({ ...errors, category: "" });
+                }}
+                error={errors.category}
+                categories={allCategories}
+              />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl 
-                fullWidth 
-                margin="normal" 
+            <Grid item xs={12}>
+              <TextField
+                label="Date"
+                type="date"
+                value={date}
+                onChange={(e) => {
+                  setDate(e.target.value);
+                  setErrors({ ...errors, date: "" });
+                }}
+                fullWidth
+                margin="normal"
                 required
-                error={!!errors.category}
-              >
-                <InputLabel id="category-label">Category</InputLabel>
-                <Select
-                  labelId="category-label"
-                  value={category}
-                  onChange={(e) => {
-                    setCategory(e.target.value);
-                    setErrors({ ...errors, category: "" });
-                  }}
-                  label="Category"
-                  name="category"
-                >
-                  {allCategories.map((cat) => (
-                    <MenuItem key={cat} value={cat}>
-                      {cat}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.category && (
-                  <FormHelperText>{errors.category}</FormHelperText>
-                )}
-              </FormControl>
+                name="date"
+                error={!!errors.date}
+                helperText={errors.date}
+              />
             </Grid>
-            <TextField
-              item
-              xs={12}
-              sm={6}
-              type="date"
-              value={date}
-              onChange={(e) => {
-                setDate(e.target.value);
-                setErrors({ ...errors, date: "" });
-              }}
-              fullWidth
-              margin="normal"
-              required
-              name="date"
-              error={!!errors.date}
-              helperText={errors.date}
-            />
           </Grid>
         </DialogContent>
         <DialogActions>

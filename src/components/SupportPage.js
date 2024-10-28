@@ -4,68 +4,13 @@ import {
   Typography,
   CircularProgress,
   Paper,
-  Avatar,
   List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
   TextField,
   Button,
-  Chip,
   Divider,
 } from "@mui/material";
 import { onRenderCallback } from "../utils/onRenderCallback";
-
-// Componente para el contacto individual (mejora la reusabilidad)
-const ContactItem = React.memo(({ user }) => (
-  <ListItem sx={{ mb: 2 }}>
-    <ListItemAvatar>
-      <Avatar sx={{ bgcolor: 'primary.main' }}>{user.name[0]}</Avatar>
-    </ListItemAvatar>
-    <ListItemText
-      primary={
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {user.name}
-          <Chip 
-            label={user.company.name} 
-            size="small" 
-            color="primary" 
-            variant="outlined"
-          />
-        </Box>
-      }
-      secondary={
-        <>
-          <Typography component="span" variant="body2">
-            Email: {user.email}
-          </Typography>
-          <br />
-          <Typography component="span" variant="body2">
-            Phone: {user.phone}
-          </Typography>
-        </>
-      }
-    />
-    <Box sx={{ display: 'flex', gap: 1 }}>
-      <Button
-        variant="contained"
-        color="primary"
-        href={`mailto:${user.email}`}
-        size="small"
-      >
-        Email
-      </Button>
-      <Button
-        variant="outlined"
-        color="primary"
-        href={`tel:${user.phone}`}
-        size="small"
-      >
-        Call
-      </Button>
-    </Box>
-  </ListItem>
-));
+import ContactItem from "./ContactItem"; // Importar el nuevo componente
 
 function SupportPage() {
   const [users, setUsers] = useState([]);
@@ -183,7 +128,7 @@ function SupportPage() {
               <List>
                 {filteredUsers.map((user) => (
                   <React.Fragment key={user.id}>
-                    <ContactItem user={user} />
+                    <ContactItem user={user} /> {/* Usar el nuevo componente */}
                     {user.id !== filteredUsers[filteredUsers.length - 1].id && (
                       <Divider variant="inset" component="li" />
                     )}
