@@ -14,6 +14,7 @@ import {
   Alert,
   Typography,
 } from "@mui/material";
+import TransactionList from "./TransactionList";
 
 function RecentTransactions() {
   const transactions = useStore(transactionsStore);
@@ -33,32 +34,7 @@ function RecentTransactions() {
   return (
     <Box sx={{ maxWidth: "100%", overflow: "auto" }}>
       <Typography variant="h6" gutterBottom>Recent Transactions</Typography>
-      <TableContainer component={Paper}>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Description</TableCell>
-              <TableCell>Amount (€)</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell>Category</TableCell>
-              <TableCell>Date</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {recentTransactions.map((transaction) => (
-              <TableRow key={transaction.id}>
-                <TableCell>{transaction.description}</TableCell>
-                <TableCell>{transaction.amount.toFixed(2)}</TableCell>
-                <TableCell>{transaction.type}</TableCell>
-                <TableCell>{transaction.category}</TableCell>
-                <TableCell>
-                  {new Date(transaction.date).toLocaleDateString("en-US")}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <TransactionList transactions={recentTransactions} />
     </Box>
   );
 }
