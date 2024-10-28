@@ -10,12 +10,17 @@ import {
   Grid,
   Box,
   TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { categoryKeywords } from "../constants/categoryKeywords";
 import { allCategories } from "../constants/categories";
 import DescriptionField from "./DescriptionField";
 import AmountField from "./AmountField";
 import CategoryField from "./CategoryField";
+import TypeField from "./TypeField"; 
 
 const TransactionForm = memo(({ transactionToEdit, onClose }) => { 
   const transactions = useStore(transactionsStore);
@@ -27,7 +32,7 @@ const TransactionForm = memo(({ transactionToEdit, onClose }) => {
     transactionToEdit ? transactionToEdit.amount : ""
   );
   const [type, setType] = useState(
-    transactionToEdit ? transactionToEdit.type : "expense"
+    transactionToEdit ? transactionToEdit.type : "expense" 
   );
   const [category, setCategory] = useState(
     transactionToEdit ? transactionToEdit.category : ""
@@ -42,6 +47,7 @@ const TransactionForm = memo(({ transactionToEdit, onClose }) => {
     amount: "",
     category: "",
     date: "",
+    type: "", 
   });
 
   const assignCategory = (desc) => {
@@ -58,7 +64,7 @@ const TransactionForm = memo(({ transactionToEdit, onClose }) => {
       const category = assignCategory(description);
       setCategory(category);
     }
-  }, [transactionToEdit]);
+  }, [transactionToEdit, description]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -95,6 +101,11 @@ const TransactionForm = memo(({ transactionToEdit, onClose }) => {
         newErrors.date = "Date cannot be in the future";
         isValid = false;
       }
+    }
+
+    if (!type) {
+      newErrors.type = "Type is required"; 
+      isValid = false;
     }
 
     setErrors(newErrors);
@@ -157,6 +168,16 @@ const TransactionForm = memo(({ transactionToEdit, onClose }) => {
                 }}
                 error={errors.amount}
                 helperText={errors.amount}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TypeField 
+                value={type}
+                onChange={(e) => {
+                  setType(e.target.value);
+                  setErrors({ ...errors, type: "" });
+                }}
+                error={errors.type}
               />
             </Grid>
             <Grid item xs={12} sm={6}>

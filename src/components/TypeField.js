@@ -7,27 +7,24 @@ import {
   FormHelperText,
 } from "@mui/material";
 
-const CategoryField = ({ value, onChange, error, categories }) => {
+const TypeField = ({ value, onChange, error }) => {
   return (
     <FormControl fullWidth margin="normal" required error={!!error}>
-      <InputLabel id="category-label">Category</InputLabel>
+      <InputLabel id="type-label">Type</InputLabel>
       <Select
-        labelId="category-label"
+        labelId="type-label"
         value={value}
         onChange={onChange}
-        label="Category"
-        name="category"
+        label="Type"
+        name="type"
         variant="outlined"
       >
-        {categories.map((cat) => (
-          <MenuItem key={cat} value={cat}>
-            {cat}
-          </MenuItem>
-        ))}
+        <MenuItem value="expense">Expense</MenuItem>
+        <MenuItem value="income">Income</MenuItem>
       </Select>
       {error && <FormHelperText>{error}</FormHelperText>}
     </FormControl>
   );
 };
 
-export default CategoryField;
+export default TypeField;

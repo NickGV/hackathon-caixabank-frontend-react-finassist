@@ -17,6 +17,7 @@ import {
   Box,
   Typography,
 } from "@mui/material";
+import TransactionForm from "./TransactionForm";
 
 function TransactionList({ transactions: propTransactions }) {
   const transactionsFromStore = useStore(transactionsStore);
@@ -25,20 +26,20 @@ function TransactionList({ transactions: propTransactions }) {
   const [filterCategory, setFilterCategory] = useState("");
   const [filterType, setFilterType] = useState("");
   const [sortField, setSortField] = useState("");
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [openForm, setOpenForm] = useState(false); 
+  const [transactionToEdit, setTransactionToEdit] = useState(null); 
 
   const deleteTransaction = useCallback((id) => {
     const currentTransactions = transactionsStore.get();
     const updatedTransactions = currentTransactions.filter(
       (transaction) => transaction.id !== id
     );
-    transactionsStore.set(updatedTransactions); // Update the store
+    transactionsStore.set(updatedTransactions); 
   }, []);
 
-  // Implement edit functionality
   const handleEdit = useCallback((transaction) => {
-    // Implement functionality to edit a transaction
+    setTransactionToEdit(transaction); 
+    setOpenForm(true); 
   }, []);
 
   const filteredTransactions = useMemo(() => {
@@ -71,25 +72,17 @@ function TransactionList({ transactions: propTransactions }) {
         Transaction List
       </Typography>
 
-      {/* Add transaction */}
-      {/* Instructions:
-                - Implement the logic to open a form for adding a new transaction.
-                - Trigger the form/modal through the onClick event. */}
       <Button
         variant="contained"
         color="primary"
         onClick={() => {
-          /* Implement functionality to add transaction */
+          setTransactionToEdit(null);
+          setOpenForm(true); 
         }}
       >
         Add Transaction
       </Button>
 
-      {/* Filters */}
-      {/* Instructions:
-                - Implement category and type filters using Material UI's `Select` component.
-                - Update the filterCategory and filterType state values when the user makes a selection.
-                - Apply the selected filters to the displayed transactions. */}
       <Box sx={{ display: "flex", gap: 2, my: 2 }}>
         <FormControl sx={{ minWidth: 120 }}>
           <InputLabel id="filter-category-label">Category</InputLabel>
@@ -99,7 +92,10 @@ function TransactionList({ transactions: propTransactions }) {
             onChange={(e) => setFilterCategory(e.target.value)}
           >
             <MenuItem value="">All</MenuItem>
-            {/* Add additional categories dynamically */}
+            {/* Aquí puedes agregar dinámicamente las categorías */}
+            {Array.from(new Set(transactions.map(t => t.category))).map(category => (
+              <MenuItem key={category} value={category}>{category}</MenuItem>
+            ))}
           </Select>
         </FormControl>
 
@@ -130,11 +126,6 @@ function TransactionList({ transactions: propTransactions }) {
         </FormControl>
       </Box>
 
-      {/* Table of transactions */}
-      {/* Instructions:
-                - Render the transactions in a table format using Material UI's `Table` component.
-                - For each transaction, display the following details: description, amount, type, category, and date.
-                - Implement the action buttons (Edit, Delete) within each row for managing transactions. */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -164,6 +155,17 @@ function TransactionList({ transactions: propTransactions }) {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Formulario de transacción */}
+      {openForm && (
+        <TransactionForm 
+          transactionToEdit={transactionToEdit} 
+          onClose={() => {
+            setOpenForm(false);
+            setTransactionToEdit(null); 
+          }} 
+        />
+      )}
     </Box>
   );
 }
