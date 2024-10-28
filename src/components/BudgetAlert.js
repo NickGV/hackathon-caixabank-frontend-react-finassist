@@ -35,29 +35,26 @@ const BudgetAlert = () => {
         notificationCount: budgetAlertStore.get().notificationCount + 1,
         severity: "warning",
       });
-    } else if (categoryExpenses) {
+    } else if (categoryExceeded) {
       budgetAlertStore.set({
         isVisible: true,
-        message: `You have exceeded your category budget limit of ${userSettings.categoryLimits} €!`,
+        message: `You have exceeded your category budget limit!`,
         notificationCount: budgetAlertStore.get().notificationCount + 1,
         severity: "warning",
       });
     } else {
       budgetAlertStore.set({
-        isVisible: true,
-        message: `You have exceeded your category budget limit of ${userSettings.categoryLimits} €!`,
-        notificationCount: budgetAlertStore.get().notificationCount + 1,
+        isVisible: false,
+        message: "",
+        notificationCount: 0,
         severity: "info",
       });
     }
-    // Instructions:
-    // - If the budget has been exceeded, set the `isVisible` property in the `budgetAlertStore` to true and provide a warning message.
-    // - If the budget has not been exceeded, set `isVisible` to false and clear the message.
-  }, [budgetExceeded, userSettings.totalBudgetLimit]);
+  }, [budgetExceeded, categoryExceeded, userSettings]);
 
   return (
     <Alert
-      severity={BudgetAlert.severity}
+      severity={budgetAlertStore.get().severity}
       sx={{ mb: 2 }}
       hidden={!budgetAlertStore.get().isVisible}
     >

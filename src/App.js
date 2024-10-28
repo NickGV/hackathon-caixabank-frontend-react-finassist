@@ -13,10 +13,11 @@ import Footer from './components/Footer';
 import SupportPage from './components/SupportPage';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
+import ForgotPasswordPage from './components/ForgotPasswordPage'; // Import ForgotPasswordPage
 import ProtectedRoute from './components/ProtectedRoute'; // Import for route protection
 import { authStore } from './stores/authStore'; // Import auth store for authentication state
 import { useStore } from '@nanostores/react'; // Nanostores to track auth
-import BudgetAlert from './components/BudgetAlert'; // Importar BudgetAlert
+import BudgetAlert from './components/BudgetAlert'; // Import BudgetAlert
 
 function App() {
   const auth = useStore(authStore); // Get authentication status from auth store
@@ -54,7 +55,7 @@ function App() {
         >
           <Navbar toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
           <Container sx={{ flex: 1, mt: 4 }}>
-            <BudgetAlert /> {/* Mostrar BudgetAlert aquí */}
+            {auth.isAuthenticated && <BudgetAlert />} {/* Show BudgetAlert only if authenticated */}
             <Routes>
               {/* Protected routes */}
               <Route element={<ProtectedRoute isAuthenticated={auth.isAuthenticated} />}>
@@ -68,6 +69,7 @@ function App() {
               {/* Public routes */}
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             </Routes>
           </Container>
           <Footer /> {/* Always stick footer to the bottom */}

@@ -8,10 +8,11 @@ function ForgotPasswordPage() {
     const handleSubmit = (e) => {
         e.preventDefault(); 
 
-        // Simulate sending a password recovery email.
-        // Instructions:
-        // - If the email matches 'user@example.com', display a success message.
-        // - If the email does not match, display an error message indicating the email is not found.
+        if (email === 'user@example.com') {
+            setMessage('A password reset link has been sent to your email.');
+        } else {
+            setMessage('Email not found. Please check and try again.');
+        }
     };
 
     return (

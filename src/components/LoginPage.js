@@ -18,7 +18,7 @@ function LoginPage() {
   const navigate = useNavigate();
 
   const defaultCredentials = {
-    email: "default@example.com",
+    email: "user@gmail.com",
     password: "password123",
   };
 
